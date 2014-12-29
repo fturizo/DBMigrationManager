@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Database Migration Manager for EE Applications</title>
+    </h:head>
+    <h:body>
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Database Migration Manager</a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#">Menu option</a></li>
+                    </ul>
+                    <h:form>
+                        <p:selectOneMenu id="dsSelector" value="#{dataSourceReferencer.currentDSName}">
+                            <f:selectItem itemLabel="Select a data source" itemValue="#{null}"/>
+                            <f:selectItems value="#{datasourceLister.registeredDatasourceNames}"/>
+                            <p:ajax update=":migrationData"/>
+                        </p:selectOneMenu>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+        <p:messages id="statusMessages" autoUpdate="true"/>
+        <br/>
+        <p:dataTable id="migrationData" value="#{migrationQuerier.migrations}" var="migration"
+                     emptyMessage="No migrations found on the selected resource">
+            <p:column headerText="Version Rank">#{migration.versionRank}</p:column>
+            <p:column headerText="Installed Rank">#{migration.installedRank}</p:column>
+            <p:column headerText="Version">#{migration.version}</p:column>
+            <p:column headerText="Description">#{migration.description}</p:column>
+            <p:column headerText="Type">#{migration.type}</p:column>
+            <p:column headerText="Script">#{migration.script}</p:column>
+            <p:column headerText="Checksum">#{migration.checksum}</p:column>
+            <p:column headerText="Installed By">#{migration.installer}</p:column>
+            <p:column headerText="Installed On">
+                <h:outputText value="#{migration.installDate}">
+                    <f:convertDateTime pattern="dd/MM/yyyy hh:mm:ss a"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="Success">#{migration.success ? 'Yes' : 'No'}</p:column>
+        </p:dataTable>
+    </h:body>
+</html>
+
