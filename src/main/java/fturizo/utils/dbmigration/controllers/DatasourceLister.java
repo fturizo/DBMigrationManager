@@ -2,6 +2,7 @@ package fturizo.utils.dbmigration.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -15,12 +16,13 @@ import org.omnifaces.util.Messages;
  * @author Fabio Andres
  */
 @Named
+@RequestScoped
 public class DatasourceLister {
     
     private static final String JDBC_NAME_CONTEXT = "jdbc";
     
     public List<String> getRegisteredDatasourceNames(){
-        List<String> dsNames = new ArrayList<String>(); 
+        List<String> dsNames = new ArrayList<>(); 
         try{
             InitialContext context = new InitialContext();
             NamingEnumeration<NameClassPair> results = context.list(JDBC_NAME_CONTEXT);

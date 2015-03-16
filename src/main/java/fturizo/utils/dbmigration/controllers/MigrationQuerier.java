@@ -6,8 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.sql.DataSource;
@@ -18,29 +18,31 @@ import org.omnifaces.util.Messages;
  * @author Fabio Andres
  */
 @Named
+@RequestScoped
 public class MigrationQuerier {
 
-    private final static String MIGRATION_QUERY = "select * from \"schema_version\" order by version_rank";
+    private final static String MIGRATION_QUERY = "select * from \"schema_version\" order by \"version_rank\"";
 
     @Inject
-    public DataSource dataSource;
-
+    private DataSource dataSource;
+    private final List<Migration> migrationList = new ArrayList<>();
+    
     public List<Migration> getMigrations() {
+        return migrationList;
+    }
+
+    public void queryMigrations() {
         if (dataSource != null) {
             try (Connection connection = dataSource.getConnection();
                     Statement statement = connection.createStatement();
                     ResultSet rs = statement.executeQuery(MIGRATION_QUERY)) {
-                List<Migration> migrationList = new ArrayList<>();
                 while (rs.next()) {
                     migrationList.add(buildMigration(rs));
                 }
-                return migrationList;
             } catch (SQLException ex) {
                 Messages.addGlobalError("Error querying migration data: {0} - {1}", ex.getErrorCode(), ex.getMessage());
-                ex.printStackTrace();
             }
         }
-        return Collections.emptyList();
     }
 
     private Migration buildMigration(ResultSet rs) throws SQLException {
@@ -54,6 +56,6 @@ public class MigrationQuerier {
                 rs.getString("\"installed_by\""),
                 rs.getDate("\"installed_on\""),
                 rs.getLong("\"execution_time\""),
-                rs.getInt("\"sucess\"") == 0);
+                rs.getInt("\"success\"") == 0);
     }
 }
